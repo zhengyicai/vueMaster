@@ -28,7 +28,7 @@
 </template>
 
 <script>
-  import { requestLogin } from '../api/api';
+  // import { requestLogin } from '../api/api';
   import { url } from '../api/api';
   //import NProgress from 'nprogress'
   export default {
@@ -53,7 +53,7 @@
         data:{
             loginName:"admin1",
             password:"1q2w3e",
-            imgKey:"1e884f34b6a64bcb87260f0099164d64",
+            imgKey:"",
             picCode:""
         },
         imgStr:""

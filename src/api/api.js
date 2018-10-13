@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 let base = '';
+//访问接口服务器
 export const url  = "http://127.0.0.1:8080/cms";
 
 export const requestLogin = params => { return axios.post(`${base}/login`, params).then(res => res.data); };
