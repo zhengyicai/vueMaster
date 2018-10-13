@@ -9,7 +9,7 @@ import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
-import TableTest from './views/nav1/TableTest.vue'
+// import TableTest from './views/nav1/TableTest.vue'
 let routes = [
     {
         path: '/login',
@@ -32,7 +32,7 @@ let routes = [
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/table', component: Table, name: 'Table' },
-            { path: '/tableTest', component: TableTest, name: '列表测试' },
+            // { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]
