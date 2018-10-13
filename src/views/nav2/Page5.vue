@@ -83,7 +83,7 @@
 		 this.$axios.get(url+'/community/findAll', {params:this.page}).then(response => {
 			 			if(response.data.code == '0000'){
 								 this.datalist = response.data.data;
-								 this.total = response.data.page.totalCount;
+								 this.total = response.data.page.totalCount; 
 								 this.totalsize  = response.data.page.pageSize;
 						 }
                  
@@ -93,14 +93,14 @@
 	},
     data() {
       return {
-		total:0,
-		totalsize:0,
+		total:0,     //数据的总数量
+		totalsize:0,  //总的页数 = 总数量/每页显示的条数
 		currentPage: 1,
 		pageNumber:1,
 		datalist:[],
 		page:{
-			pageSize:1,
-			pageNumber:this.pageNumber
+			pageSize:1,    //当前选中页
+			pageNumber:this.pageNumber  //每页显示的条数
 		},
 		listLoading: false
       };
