@@ -78,7 +78,12 @@
         this.$refs.ruleForm2.validate((valid) => {
           if (valid) {
             
-          this.$axios.post(url+'/login/loginIn',this.data).then(response => {
+          this.$axios.post(url+'/login/loginIn',this.data, {
+          headers: {
+           
+            'token':'asdf'
+          }
+}).then(response => {
                   //this.testData = response.data
                  
                   if(response.data.code=='0000'){
