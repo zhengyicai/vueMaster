@@ -79,11 +79,10 @@
           if (valid) {
             
           this.$axios.post(url+'/login/loginIn',this.data, {
-          headers: {
-           
+          headers: { 
             'token':'asdf'
           }
-}).then(response => {
+          }).then(response => {
                   //this.testData = response.data
                  
                   if(response.data.code=='0000'){
