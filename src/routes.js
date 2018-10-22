@@ -35,6 +35,7 @@ let routes = [
             { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
+            
         ]
     },
     {
