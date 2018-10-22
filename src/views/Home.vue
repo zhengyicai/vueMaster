@@ -1,13 +1,13 @@
 <template>
 	<el-row class="container">
 		<el-col :span="24" class="header">
-			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
+			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'" style="font-size:18px;font-weight:bold">
 				{{collapsed?'':sysName}}
 			</el-col>
 			<el-col :span="10">
-				<div class="tools" @click.prevent="collapse">
+				<!-- <div class="tools" @click.prevent="collapse">
 					<i class="fa fa-align-justify"></i>
-				</div>
+				</div> -->
 			</el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
@@ -25,16 +25,16 @@
 				<!--导航菜单-->
 				<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
 					 unique-opened router v-show="!collapsed">
-					<template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
-						<el-submenu :index="index+''" v-if="!item.leaf">
-							<template slot="title"><i :class="item.iconCls"></i>{{item.name}}</template>
-							<el-menu-item v-for="child in item.children" :index="child.path" :key="child.path" v-if="!child.hidden">{{child.name}}</el-menu-item>
+					<template v-for="(item,index) in roleData" >
+						<el-submenu :index="index+''"  v-bind:key="item.id">
+							<template slot="title"><i :class="item.iconCls"></i>{{item.resName}}</template>
+							<el-menu-item v-for="child in item.children" :index="child.resPath" :key="child.resPath">{{child.resName}}</el-menu-item>
 						</el-submenu>
-						<el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+						<!-- <el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item> -->
 					</template>
 				</el-menu>
 				<!--导航菜单-折叠后-->
-				<ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
+				<!-- <ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
 					<li v-for="(item,index) in $router.options.routes" v-if="!item.hidden" class="el-submenu item">
 						<template v-if="!item.leaf">
 							<div class="el-submenu__title" style="padding-left: 20px;" @mouseover="showMenu(index,true)" @mouseout="showMenu(index,false)"><i :class="item.iconCls"></i></div>
@@ -48,7 +48,7 @@
 							</li>
 						</template>
 					</li>
-				</ul>
+				</ul> -->
 			</aside>
 			<section class="content-container">
 				<div class="grid-content bg-purple-light">
@@ -72,10 +72,11 @@
 </template>
 
 <script>
+ import { url } from '../api/api';
 	export default {
 		data() {
 			return {
-				sysName:'VUEADMIN',
+				sysName:'声波门禁管理系统',
 				collapsed:false,
 				sysUserName: '',
 				sysUserAvatar: '',
@@ -88,8 +89,19 @@
 					type: [],
 					resource: '',
 					desc: ''
-				}
+				},
+				roleData:[]
 			}
+		},
+		created:function(){
+			
+			  
+			  this.$axios.get(url+'/main/findVueMenus?roleId='+'d3446654a7474e9db5d38c3826f99f4f').then(response => {
+                 this.roleData = response.data.data;
+                 
+                }).catch(error => {
+                  console.log(error)
+          })		
 		},
 		methods: {
 			onSubmit() {

@@ -31,8 +31,8 @@ let routes = [
         iconCls: 'el-icon-message',//图标样式class
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
-             { path: '/tableTest', component: TableTest, name: '列表测试' },
+            { path: '/table',component: resolve => require(['./views/nav1/Table.vue'], resolve), name: 'Table' },
+            { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]
