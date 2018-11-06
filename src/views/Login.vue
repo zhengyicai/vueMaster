@@ -5,10 +5,10 @@
       <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container"  >
         <h3 class="title">声波门禁管理系统</h3>
         <el-form-item prop="account">
-          <el-input type="text" v-model="data.loginName" auto-complete="off" placeholder="账号"></el-input>
+          <el-input type="text" @keyup.enter.native="handleSubmit2" v-model="data.loginName" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
         <el-form-item prop="checkPass">
-          <el-input type="password" v-model="data.password" auto-complete="off" placeholder="密码"></el-input>
+          <el-input type="password" @keyup.enter.native="handleSubmit2" v-model="data.password" auto-complete="off" placeholder="密码"></el-input>
         </el-form-item>
         
 
@@ -16,16 +16,16 @@
             <el-col :span="14">
             
                 <el-form-item prop="account">
-                    <el-input  type="text" v-model="data.picCode" auto-complete="off" placeholder="验证码"></el-input>
+                    <el-input  type="text"   @keyup.enter.native="handleSubmit2"   v-model="data.picCode" auto-complete="off" placeholder="验证码"></el-input>
                 </el-form-item>
             
             </el-col>
-            <el-col :span="10" style="padding-left:20px"> <img :span="10"  :src="imgStr"> </el-col>
+            <el-col :span="10" style="padding-left:20px"> <img :span="10"  :src="imgStr"  @click="loadImg"> </el-col>
         </el-row>
         <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
         
         <el-form-item style="width:100%;">
-          <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
+          <el-button type="primary" style="width:100%;"   @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
           <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
         </el-form-item>
       
@@ -37,6 +37,9 @@
 <script>
   // import { requestLogin } from '../api/api';
   import { url } from '../api/api';
+  import { RequestPost } from '../api/api';
+    import { RequestGet } from '../api/api';
+  
   //import NProgress from 'nprogress'
   export default {
     data() {
@@ -67,68 +70,86 @@
       };
     },
     created:function(){
-       this.$axios.get(url+'/login/loadImgCode').then(response => {
-                  this.data.imgKey  = response.data.data.imgKey;
-                  this.imgStr = "data:image/jpg;base64,"+response.data.data.imgStr;
-                 
-                }).catch(error => {
-                  console.log(error)
-          })
+        this.loadImg();
 
     },
     methods: {
       handleReset2() {
         this.$refs.ruleForm2.resetFields();
       },
+      loadImg(){
+        // this.$axios.get(url+'/login/loadImgCode').then(response => {
+        //           this.data.imgKey  = response.data.data.imgKey;
+        //           this.imgStr = "data:image/jpg;base64,"+response.data.data.imgStr;
+                 
+        //         }).catch(error => {
+        //           console.log(error)
+        //   })
+        RequestGet("/login/loadImgCode").then(response => {
+                
+                this.data.imgKey  = response.data.imgKey;
+                this.imgStr = "data:image/jpg;base64,"+response.data.imgStr;
+            }).catch(error => {
+                // this.$message({
+                //     message:"error",
+                //     type: 'error'
+                // });
+              })
+      },
       handleSubmit2(ev) {
         var _this = this;
         this.$refs.ruleForm2.validate((valid) => {
           if (valid) {
             
-          this.$axios.post(url+'/login/loginIn',this.data, {
-          headers: { 
-            'token':'asdf'
-          }
-          }).then(response => {
+          // this.$axios.post(url+'/login/loginIn',this.data, {
+          // headers: { 
+          //   'token':'asdf'
+          // }
+          // }).then(response => {
                   //this.testData = response.data
                  
-                  if(response.data.code=='0000'){
-                    sessionStorage.setItem('user', JSON.stringify(response.data.data));
-                    this.$router.push({ path: '/table' });
+                //   if(response.data.code=='0000'){
+                //     sessionStorage.setItem('user', JSON.stringify(response.data.data));
+                //     this.$router.push({ path: '/table' });
+                //   }else{
+                //     this.$message({
+                //         message: response.data.message,
+                //         type: 'error'
+                //     });
+                //   }
+                // }).catch(error => {
+                //     this.$message({
+                //         message:"error",
+                //         type: 'error'
+                //     });
+                //  })
+
+
+         
+         
+            this.logining = true;
+
+            //登录接口
+            RequestPost("/login/loginIn",this.data).then(response => {
+                  
+                  this.logining = false; 
+                  if(response.code=='0000'){
+                    sessionStorage.setItem('user', JSON.stringify(response.data));
+                     sessionStorage.setItem('token', response.data);
+                   
+                    this.$router.push({ path: '/homeIndex' });
                   }else{
                     this.$message({
-                        message: response.data.message,
+                        message: response.message,
                         type: 'error'
                     });
                   }
-                }).catch(error => {
-                    this.$message({
-                        message:"error",
-                        type: 'error'
-                    });
-                 })
-
-
-          /*
-           //_this.$router.replace('/table');
-            this.logining = true;
-            //NProgress.start();
-            var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            requestLogin(loginParams).then(data => {
-              this.logining = false;
-              //NProgress.done();
-              let { msg, code, user } = data;
-              if (code !== 200) {
-                this.$message({
-                  message: msg,
-                  type: 'error'
-                });
-              } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({ path: '/table' });
-              }
-            });
-           */
+            }).catch(error => {
+               this.$router.push({ path: '/login' });
+              })
+           
+          
+           
           } else {
             console.log('error submit!!');
             return false;

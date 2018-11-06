@@ -27,15 +27,32 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '导航一',
-        iconCls: 'el-icon-message',//图标样式class
+        name: '我的桌面',
+        iconCls: 'fa fa-id-card-o',//图标样式class
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table',component: resolve => require(['./views/nav1/Table.vue'], resolve), name: 'Table' },
+            { path: '/homeIndex',component: resolve => require(['./views/desktop/HomeIndex.vue'], resolve),  name: '主页' },
+            { path: '/community',component: resolve => require(['./views/desktop/Community.vue'], resolve), name: '小区管理' },
+            { path: '/building',component: resolve => require(['./views/desktop/Building.vue'], resolve), name: '楼栋管理' },
+            { path: '/room',component: resolve => require(['./views/desktop/Room.vue'], resolve), name: '房间管理' },
+            { path: '/resident',component: resolve => require(['./views/desktop/Resident.vue'], resolve), name: '住户管理' },
+            { path: '/equipment',component: resolve => require(['./views/desktop/Equipment.vue'], resolve), name: '设备管理' },
             { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
-            
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '系统管理',
+        iconCls: 'fa fa-id-card-o',//图标样式class
+        children: [
+            { path: '/message',component: resolve => require(['./views/system/Message.vue'], resolve),  name: '消息管理' },
+            { path: '/notice',component: resolve => require(['./views/system/Notice.vue'], resolve), name: '公告管理' },
+            { path: '/parameter',component: resolve => require(['./views/system/Parameter.vue'], resolve), name: '参数设置' },
+            { path: '/role',component: resolve => require(['./views/system/Role.vue'], resolve), name: '权限管理' },
+            { path: '/updatePw',component: resolve => require(['./views/system/UpdatePw.vue'], resolve), name: '修改密码' },
+            { path: '/userInfo',component: resolve => require(['./views/system/UserInfo.vue'], resolve), name: '账户管理' },
         ]
     },
     {

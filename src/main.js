@@ -13,16 +13,31 @@ import routes from './routes'
 // import Mock from './mock'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
+
+//import '../theme/index.css';
 import axios from 'axios'
+import { Message } from 'element-ui';
+import api from './api/api'
+import timeFormat from './api/format'
+import dateFormat from './api/format'
+import state from './api/format'
+Vue.prototype.$message = Message;
 Vue.prototype.$axios = axios
 
+
+// Vue.use(timeFormat);
+// Vue.use(dateFormat);
+// Vue.use(state);
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+
+Vue.use(require('vue-moment'));
 //NProgress.configure({ showSpinner: false });
 
 const router = new VueRouter({
-  routes
+  routes,
+  api
 })
 
 router.beforeEach((to, from, next) => {

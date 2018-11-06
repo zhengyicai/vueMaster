@@ -3,6 +3,7 @@
 		<el-col :span="24" class="header">
 			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'" style="font-size:18px;font-weight:bold">
 				{{collapsed?'':sysName}}
+				<span style="font-size:10px">{{sysNo}}</span>
 			</el-col>
 			<el-col :span="10">
 				<!-- <div class="tools" @click.prevent="collapse">
@@ -73,10 +74,12 @@
 
 <script>
  import { url } from '../api/api';
+ import { RequestGet } from '../api/api';
 	export default {
 		data() {
 			return {
 				sysName:'声波门禁管理系统',
+				sysNo:'v1.0.0',
 				collapsed:false,
 				sysUserName: '',
 				sysUserAvatar: '',
@@ -95,13 +98,39 @@
 		},
 		created:function(){
 			
-			  
-			  this.$axios.get(url+'/main/findVueMenus?roleId='+'d3446654a7474e9db5d38c3826f99f4f').then(response => {
-                 this.roleData = response.data.data;
+			RequestGet("/user/findUser").then(response => {
+                this.sysUserName = response.data.userName;
+				 this.sysUserAvatar = "";
+				 
+				 var person = {
+					 "roleId":response.data.roleId
+				 }
+
+				 RequestGet("/main/findVueMenus",person).then(response1 => {
+						this.roleData = response1.data;
+					
+					}).catch(error => {
+						 this.$router.push({ path: '/login' });
+						
+					})  
+					
+				
+              
+            }).catch(error => {
+				 this.$router.push({ path: '/login' });
+                
+			  })
+			
+			
+			
+
+
+		// 	  this.$axios.get(url+'/main/findVueMenus?='+'').then(response => {
+        //          this.roleData = response.data.data;
                  
-                }).catch(error => {
-                  console.log(error)
-          })		
+        //         }).catch(error => {
+        //           console.log(error)
+        //   })		
 		},
 		methods: {
 			onSubmit() {
@@ -138,12 +167,11 @@
 			}
 		},
 		mounted() {
-			var user = sessionStorage.getItem('user');
-			if (user) {
-				user = JSON.parse(user);
-				this.sysUserName = user.name || '';
-				this.sysUserAvatar = user.avatar || '';
-			}
+			// var user = sessionStorage.getItem('user');
+			// if (user) {
+			// 	user = JSON.parse(user);
+			 	
+			// }
 
 		}
 	}
@@ -151,7 +179,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import '~scss_vars';
+	 @import './element-variables';
 	
 	.container {
 		position: absolute;
@@ -161,7 +189,7 @@
 		.header {
 			height: 60px;
 			line-height: 60px;
-			background: $color-primary;
+			background: $--color-primary;
 			color:#fff;
 			.userinfo {
 				text-align: right;
