@@ -28,7 +28,7 @@
 			</el-table-column>
 			<el-table-column prop="area" label="区县" min-width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="address" label="地址" min-width="180" sortable>
+			<el-table-column prop="address" label="地址" min-width="120" sortable>
 			</el-table-column>
 			<!-- <el-table-column prop="createTime" :formatter="dateFormat"  label="创建时间" min-width="120" sortable>
 						
@@ -37,20 +37,28 @@
 			<el-table-column  label="创建时间" min-width="120">
 				<template slot-scope="scope">{{ scope.row.createTime | moment('YYYY-MM-DD') }}</template>
 			</el-table-column>
-			<el-table-column  label="状态" min-width="120">
+			<el-table-column  label="状态" min-width="80">
 				<template slot-scope="scope">{{ state(scope.row.state)}}</template>
 			</el-table-column>
 			
-			<el-table-column prop="userName" label="物业员用户名" min-width="150" sortable>
+			<el-table-column prop="userName" label="物业员用户名" min-width="150">
 			</el-table-column>
-			<el-table-column label="物业员状态" min-width="120">
+			<el-table-column label="物业员状态" min-width="110">
 				<template slot-scope="scope">{{ state(scope.row.userStatus)}}</template>
 			</el-table-column>
-			<el-table-column label="操作" min-width="250">
+			<el-table-column prop="code" label="厂商编号" min-width="110">
+			</el-table-column>
+			<!-- <el-table-column prop="userWorkName" label="工程商用户名" min-width="150" sortable>
+			</el-table-column>
+			<el-table-column label="工程商状态" min-width="120">
+				<template slot-scope="scope">{{ state(scope.row.userWorkStatus)}}</template>
+			</el-table-column> -->
+			<el-table-column label="操作" min-width="340">
 				<template scope="scope">
+				<el-button size="small" type="primary"  @click="editWork(scope.$index,scope.row)">工程商</el-button>
 				<el-button size="small" type="primary"  @click="edit(scope.$index,scope.row)">编辑</el-button>
 				<el-button size="small" type="primary"  v-if='scope.row.sysUserId=="" ||  scope.row.sysUserId ==null' @click="addAdmin(scope.$index,scope.row)">新增物业</el-button>
-				<el-button size="small" type="warning"  v-if='scope.row.sysUserId!="" ||  scope.row.sysUserId !=null' @click="editAdmin(scope.$index,scope.row)">修改物业</el-button>
+				<el-button size="small" type="warning"  v-if='scope.row.sysUserId!="" &&  scope.row.sysUserId !=null' @click="editAdmin(scope.$index,scope.row)">修改物业</el-button>
                 <!-- <el-button size="small" type="danger" @click="deleteRow(scope.$index, scope.row)">删除</el-button> -->
 				</template>
 			</el-table-column>
@@ -75,10 +83,10 @@
 					<el-input v-model="form.communityName"></el-input>
 				</el-form-item>
 				<el-form-item label="*主机数">
-					<el-input v-model="form.masterNum"></el-input>
+					<el-input type="number" v-model="form.masterNum"></el-input>
 				</el-form-item>
 				<el-form-item label="*用户数">
-					<el-input v-model="form.userNum"></el-input>
+					<el-input type="number" v-model="form.userNum"></el-input>
 				</el-form-item>
 				<el-form-item label="省" >
 					<el-select  v-model="form.provinceCode" placeholder="请选择省份" @change="selectProvince(form.provinceCode)">
@@ -169,6 +177,31 @@
 				<el-button type="primary" @click="openAdmin()">确 定</el-button>
 			</div>
         </el-dialog>
+		<!-- 查看工程商信息 -->
+		<el-dialog   title=" 查看工程商信息" :visible.sync="dialogFormWorkVisible"  width="40%">
+			<el-form ref="form1" :model="form1" label-width="100px" @submit.prevent="onSubmit" style="margin:20px;">
+				<el-form-item label="工程商用户名">
+					<el-input disabled="disabled"  placeholder="请输入用户名" v-model="form2.userWorkName"></el-input>
+					<!-- {{form2.userWorkName}} -->
+				</el-form-item>
+				
+				<el-form-item label="工程商状态">
+					<!-- <el-input disabled="disabled"  placeholder="请输入用户名" v-model="form2.userWorkStatus"></el-input> -->
+					 {{ state(form2.userWorkStatus)}}
+					<!-- <template slot-scope="scope">{{ state(scope.form2.userWorkStatus)}}</template> -->
+				</el-form-item>
+				
+
+
+				
+				
+
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="dialogFormWorkVisible = false">取 消</el-button>
+				<el-button type="primary" @click="dialogFormWorkVisible = false">确 定</el-button>
+			</div>
+        </el-dialog>
 
   </div>
 </template>
@@ -238,11 +271,23 @@
 		// this.selectArea(this.form.areaCode);
 		
 		//console.log(this.form);
-      },
+	  },
+	  editWork(index,rows){
+		
+        this.dialogFormWorkVisible = true;   
+		this.form2 = rows;
+			
+	  },
       add(){
 		this.dialogFormVisible = true;
 		this.formtitle ="新增小区";   
-		this.form = {};
+		this.form = {
+			"provinceCode":"",
+			"cityCode":"",
+			"areaCode":"",
+			"code":sessionStorage.getItem("code"),
+			"sysWorkId":sessionStorage.getItem("userId")			
+		};
         
       },
       getUsers(){
@@ -255,9 +300,11 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 					}).then(() => {	
-						RequestPost("/community/add",this.form).then(response => {
+						RequestPost("/community/workAdd",this.form).then(response => {
 							
 							//this.logining = false; 
+							
+
 							if(response.code=='0000'){
 								this.$message({
 									message: response.message,
@@ -598,7 +645,8 @@
             roleId: '7541f8cd47ca45edb046e06dc9bb2f1a',
             roleName: '物业管理员',
             state: '10',
-            communityArea:rows.id
+			communityArea:rows.id,
+			code:sessionStorage.getItem("code")
         };
     },
 	editAdmin(index,rows){
@@ -637,6 +685,7 @@
 		listLoading: false,
 		form:{},
 		form1:{},
+		form2:{},
 		dialogFormVisible:false,
 		provinces:[], //获取省份
 		citys:[], //获取市
@@ -645,6 +694,7 @@
 		formAdmintitle:"",
 		dialogFormAdminVisible:false,//物业
 		dialogFormAdminUpdateVisible:false,
+		dialogFormWorkVisible:false,  //工程商
 		isEditUser:false //是否禁用
 
 

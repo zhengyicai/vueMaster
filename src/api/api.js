@@ -7,8 +7,9 @@ import router from '../routes';
 
 let base = '';
 //访问接口服务器
-export const url  = "http://localhost:8080/cms";
-export const PageSize  = 2;
+export const url  = "http://123.207.121.118:8080/cms";
+//export const url  = "http://192.168.1.140:8080/cms";
+export const PageSize  = 10;
 
 // export const requestLogin = params => { return axios.post(`${base}/login`, params).then(res => res.data); };
 

@@ -36,6 +36,8 @@
 			</el-table-column>
 			<el-table-column prop="buildingName" label="楼栋" width="150" sortable>
 			</el-table-column>
+            <el-table-column prop="equId" label="序列号" width="150" sortable>
+			</el-table-column>
 			<el-table-column  label="单元" min-width="150" sortable>
                             <template slot-scope="scope">{{scope.row.unitName}}单元</template>    
 			</el-table-column>
@@ -79,8 +81,9 @@
 					    </el-select>
                     </el-form-item>    
                     <el-form-item label="*设备名称">
-                        <el-input v-model="subData.equipmentName"  placeholder="请选择设备名称"></el-input>
+                        <el-input v-model="subData.equipmentName"  placeholder="请输入设备名称"></el-input>
                     </el-form-item>
+                    
                     <el-form-item label="所属小区">
                         <el-select  v-model="subData.communityId" placeholder="请选择设备类型"    @change="selectCommunity(subData.communityId)">
                            <el-option :label="item.name" :key="item.value" :value="item.value" v-for="item in communitys">{{item.name}}</el-option>
@@ -95,6 +98,9 @@
                         <el-select  v-bind:disabled="isEdit"  v-model="subData.unitName" placeholder="请选择单元" @change="selectUnit(subData.unitName)">
                            <el-option :label="item.name" :key="item.value" :value="item.value" v-for="item in units">{{item.name}}</el-option>
 					    </el-select>
+                    </el-form-item>
+                    <el-form-item label="*设备序列号">
+                        <el-input  v-model="subData.equId"  placeholder="请输入设备序列号"></el-input>
                     </el-form-item>
                     <el-form-item label="状态">
 					<el-radio-group v-model="subData.state">
@@ -170,12 +176,16 @@
                 state: '10',
                 communityId:this.communityId,
                 buildingId:this.buildingId,
-                unitName:this.unitNo
+                unitName:this.unitNo,
+                equCode:"",
+                equId:""
             };
 
 
       },
       open(){
+          this.subData.equCode = this.subData.equipmentType =="10"?"0000000000":this.subData.equipmentType =="20"?"0000000000":"FFFF000000";
+          this.subData.equId = this.communityNo+this.subData.equId;
           RequestPost("/equipment/add",this.subData).then(response => {
 						
 						//this.logining = false; 
@@ -289,6 +299,25 @@
         this.buildings = [];
         this.unitNo = '';
         this.loadBuildings();
+
+        this.findOne(selectIdx);
+    },
+
+    //
+    findOne(one){
+        RequestGet("/equipment/findOne",{
+                id:one
+            }).then(response => {
+          
+						if(response.code == '0000'){
+								this.communityNo = response.data.communityNo;
+    
+						 }
+					
+        }).catch(error => {
+                this.$router.push({ path: '/login' });
+						
+		})  
     },
 
     // /**
@@ -312,6 +341,7 @@
         this.subData.unitName = this.unitNo;
     },
 
+   
     /**
     * 加载小区
     */
@@ -410,7 +440,8 @@
 		datalist:[],
 		
 		listLoading: false,
-		form:{},
+        form:{},
+        communityNo:"",
         subData:{},
         isEdit:true, //是否禁用
         dialogFormVisible:false,
@@ -423,7 +454,7 @@
         formtitle:"",
          options: [{
           value: '10',
-          label: '管理机'
+          label: '其它'
         }, {
           value: '20',
           label: '围墙机'

@@ -135,7 +135,7 @@
                   this.logining = false; 
                   if(response.code=='0000'){
                     sessionStorage.setItem('user', JSON.stringify(response.data));
-                     sessionStorage.setItem('token', response.data);
+                    sessionStorage.setItem('token', response.data);
                    
                     this.$router.push({ path: '/homeIndex' });
                   }else{
@@ -163,8 +163,8 @@
 
 <style lang="scss" scoped>
   .login-container {
-    /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
-    background-image: url("../assets/bg1.jpg");
+    box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);
+    //background-image: url("../assets/bg1.jpg");
     -webkit-border-radius: 5px;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -190,8 +190,10 @@
         position: relative;
         width:100%;
         height:100%;
-        background-image: url(../assets/login-bg.jpg);
-        background-size: 100%;
+        
+        background-image: url(/static/login-bg.jpg);
+        //background-size: 100%;
+       background-size:cover;
     }
     .ms-title{
         width:100%;

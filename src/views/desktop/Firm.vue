@@ -1,5 +1,5 @@
 <template> 
- <div class="block" style="margin-top:20px">   
+ <div class="block">   
 	 	<!-- <el-col :span="20" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true">
 				<el-form-item style="width:300px">
@@ -15,20 +15,20 @@
 				
 			</el-form>
 		</el-col> -->
-        <!-- <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+        <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" style="text-align:right" >
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-input  placeholder="姓名"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" v-on:click="getUsers">查询</el-button>
-				</el-form-item> 
+				</el-form-item> -->
 				
 				<el-form-item>
 					<el-button type="primary" @click="add()">新增</el-button>
 				</el-form-item>
 			</el-form>
-		</el-col> -->
+		</el-col>
         
 		<el-table :data="datalist" highlight-current-row v-loading="listLoading" style="width: 100%;">
 		
@@ -39,7 +39,9 @@
 			</el-table-column>
 			<el-table-column prop="mobile" label="手机号" width="250" sortable>
 			</el-table-column>
-            <el-table-column prop="roleName" label="角色" width="250" sortable>
+            <el-table-column  label="厂商编号" width="250" sortable>
+                    <template slot-scope="scope">0x{{ scope.row.code.toString(16)}}({{ scope.row.code}})</template>
+
 			</el-table-column>
 			<el-table-column  label="创建时间" min-width="120">
 				<template slot-scope="scope">{{ scope.row.createTime | moment('YYYY-MM-DD') }}</template>
@@ -49,7 +51,9 @@
 			<el-table-column  label="状态" min-width="120">
 				<template slot-scope="scope">{{ state(scope.row.state)}}</template>
 			</el-table-column>
-            
+
+            <el-table-column prop="remark" label="备注" width="250" sortable>
+			</el-table-column>
 			
 			
 			<el-table-column label="操作" min-width="250">
@@ -81,6 +85,9 @@
                     <el-form-item label="*密码">
                       <el-input v-bind:disabled="isEdit" v-model="subData.password"  placeholder="请输入密码"></el-input>
                     </el-form-item>
+                     <el-form-item label="*厂商编号">
+                      <el-input type="number" v-bind:disabled="isEdit" v-model="subData.code"  placeholder="请输入厂商编号"></el-input>
+                    </el-form-item>
                      <el-form-item label="手机号">
                         <el-input v-model="subData.mobile"  placeholder="请输入手机号"></el-input>
                     </el-form-item>
@@ -89,11 +96,15 @@
                             <el-radio :label="item.id" :key="item.id" v-for="item in roles">{{item.roleName}}</el-radio>
                         </el-radio-group>
                     </el-form-item> -->
+                    <el-form-item label="备注">
+                        <el-input v-model="subData.remark"  placeholder="请输入备注"></el-input>
+                    </el-form-item>
                     <el-form-item label="状态">
 					<el-radio-group v-model="subData.state">
 						<el-radio label="10">正常</el-radio>
 						<el-radio label="20">禁用</el-radio>
 					</el-radio-group>
+                     
 				</el-form-item>
 			</el-form>	
 			<div slot="footer" class="dialog-footer">
@@ -160,12 +171,18 @@
                 mobile: '',
                 roleId: '',
                 roleName: '',
-                state: '10'
+                state: '10',
+                code:'',
+                remark:''
             };
             for(let obj in this.roles){
-                this.subData.roleId = this.roles[obj].id;
-                this.subData.roleName = this.roles[obj].roleName;
-                break;
+                //this.subData.roleId = this.roles[obj].id;
+                //this.subData.roleName = this.roles[obj].roleName;
+                if(this.subData.roleName == '厂商管理员'){
+                    this.subData.roleId = this.roles[obj].id;
+                    break;
+                }
+                
             }
 
 
@@ -203,7 +220,10 @@
         },
       open(){
           if(this.formtitle == '新增账户'){
-              RequestPost("/user/add",this.subData).then(response => {
+              this.subData.parentId ='66b7ef552d9e4e4599e853c7d6101373';  //admin
+              this.subData.roleId='70220c5ee71e11e8987f5254003ad144';
+              this.subData.roleName='厂商管理员';
+              RequestPost("/user/firmAdd",this.subData).then(response => {
 						
 						//this.logining = false; 
 						if(response.code=='0000'){
@@ -294,10 +314,20 @@
 
 	
 	loadData(){
-
-		RequestGet("/user/findAll",this.page).then(response => {
+       
+		RequestGet("/user/findAllChild",{ parentId:"66b7ef552d9e4e4599e853c7d6101373"}).then(response => {
 						if(response.code == '0000'){
-								 this.datalist = response.data;
+                                 
+                                 this.datalist = response.data;
+                                 for(var i= 0 ;i<this.datalist.length;i++){
+                                    
+                                    // if(this.datalist[i].code != null && this.datalist[i].code != "" ){
+                                    //     this.datalist[i].code = this.datalist[i].code.toString(16);
+                                    // }
+                                    
+                                 }   
+                                 
+                                 
 								 this.total = response.page.totalCount; 
 								 this.totalsize  = response.page.pageSize;
 						 }

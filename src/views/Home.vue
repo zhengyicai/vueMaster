@@ -15,7 +15,7 @@
 					<span class="el-dropdown-link userinfo-inner"><img src="https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png" /> {{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item>我的消息</el-dropdown-item>
-						<el-dropdown-item>设置</el-dropdown-item>
+						<el-dropdown-item @click.native="updatePwd">修改密码</el-dropdown-item>
 						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
@@ -99,7 +99,9 @@
 		created:function(){
 			
 			RequestGet("/user/findUser").then(response => {
-                this.sysUserName = response.data.userName;
+				this.sysUserName = response.data.userName;
+				sessionStorage.setItem("userId",response.data.id);
+				sessionStorage.setItem("code",response.data.code);
 				 this.sysUserAvatar = "";
 				 
 				 var person = {
@@ -143,6 +145,12 @@
 				//console.log('handleclose');
 			},
 			handleselect: function (a, b) {
+			},
+			
+			//修改密码
+			updatePwd: function () {
+				var _this = this;
+				_this.$router.push('/updatePwd1');
 			},
 			//退出登录
 			logout: function () {

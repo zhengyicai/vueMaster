@@ -81,6 +81,7 @@
                         message: response.message,
                         type: 'success'
                     });  
+                    this.$router.push({ path: '/login' });
          
                 }else{
                     this.$message({
