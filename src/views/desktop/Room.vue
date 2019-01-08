@@ -29,7 +29,7 @@
                 <!-- <el-button size="small" type="primary" @click="showRelationPanel(scope.$index,scope.row)">住房信息</el-button>
                 <el-button size="small" type="danger" @click="deleteRow(scope.$index,scope.row)">删除</el-button> -->
                  <el-button size="small" type="warning"   @click="updateState(scope.row)" >编辑</el-button>
-                
+                 <el-button size="small" type="primary"   @click="updateRoom(scope.row)">房卡管理</el-button>
                 <!--<el-button size="small" type="info" v-if="scope.row.state==='30'"  @click="updateState(scope.row,'10')">授权</el-button> -->
 				</template>
 			</el-table-column>
@@ -64,6 +64,40 @@
 				<el-button type="primary" @click="open()">确 定</el-button>
 			</div>
         </el-dialog>
+
+
+        <el-dialog   title="房卡管理" :visible.sync="dialogFormVisibleRoom" >
+			<el-form ref="subData" :model="subData1" label-width="100px" @submit.prevent="onSubmit" style="margin:20px;">
+                    
+                 
+                 
+                <el-form-item label="卡号1">
+                        <el-input v-model="one" type="number" placeholder="请输入10位数的卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="卡号2">
+                        <el-input v-model="two"  placeholder="请输入10位数的卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="卡号3">
+                        <el-input v-model="three"  placeholder="请输入10位数的卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="卡号4">
+                        <el-input v-model="four"  placeholder="请输入10位数的卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="卡号5">
+                        <el-input v-model="free"  placeholder="请输入10位数的卡号"></el-input>
+                </el-form-item>
+               
+                   
+			</el-form>	
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="dialogFormVisibleRoom = false">取 消</el-button>
+				<el-button type="primary" @click="open1()">确 定</el-button>
+			</div>
+        </el-dialog>
+
+
+
+     
       
       
       
@@ -170,6 +204,30 @@
         })
 
     },
+     open1(){
+
+        this.subData1.cardNos = this.one+","+this.two+","+this.three+","+this.four+","+this.free;  
+        RequestPost("/room/addCard",this.subData1).then(response => {
+                    if(response.code=='0000'){
+                        this.$message({
+                            message: response.message,
+                            type: 'success'
+                        });  
+                        this.dialogFormVisibleRoom = false;
+                    }else{
+                        this.$message({
+                            message: response.message,
+                            type: 'error'
+                        });
+                    }
+                    //this.loadData();
+                    //this.communityId = this.subData.communityId;
+                    this.loadCommunityData();
+        }).catch(error => {
+        this.$router.push({ path: '/login' });
+        })
+
+    },
     updateState(rows){
          this.dialogFormVisible = true;
          this.subData = rows;
@@ -179,6 +237,60 @@
 
 
       },
+    updateRoom(rows){
+         this.dialogFormVisibleRoom = true;
+         this.subData1 = {};
+         this.subData = rows;
+         this.one = "";
+         this.two = "";
+         this.three = "";
+         this.four = "";
+         this.free = "";
+
+         this.subData1.buildingId = rows.buildingId;
+         this.subData1.communityId = rows.communityId;
+         this.subData1.roomId  = rows.id;
+         this.subData1.unitId = rows.unitId;
+
+
+         RequestGet("/room/findCards",{roomId:rows.id}).then(response => {
+                    if(response.code=='0000'){
+                          if(response.data.length>0){
+                              for(var i = 0 ;i<response.data.length;i++){
+                                  if(i ==0){
+                                      this.one = response.data[i].cardNo;
+                                  }else if(i ==1){
+                                      this.two = response.data[i].cardNo;
+                                  }else if(i ==2){
+                                      this.three = response.data[i].cardNo;
+                                  }else if(i ==3){
+                                      this.four = response.data[i].cardNo;
+                                  }else if(i ==4){
+                                      this.free = response.data[i].cardNo;
+                                  }
+                              }
+                          }
+                          
+
+
+                    }else{
+                        this.$message({
+                            message: response.message,
+                            type: 'error'
+                        });
+                    }
+                    //this.loadData();
+                    //this.communityId = this.subData.communityId;
+                    this.loadCommunityData();
+        }).catch(error => {
+        this.$router.push({ path: '/login' });
+        })
+         
+
+    },  
+    addCard(){
+         this.dialogFormVisible = true;   
+    },
     
     /**
     * 加载楼栋数据
@@ -287,12 +399,27 @@
         buildingId:'',
         unitId:"",
         dialogFormVisible:false,
+        dialogFormVisibleRoom:false,
         subData:{},
-		page:{
+        subData1:{
+            buildingId:"",
+            communityId:"",
+            roomId:"",
+            cardNos:"",
+            unitId:""
+
+        },
+        one:"",
+        two:"",
+        three:"",
+        four:"",
+        free:"",
+        page:{
 			pageSize:PageSize,   //一页显示的条数
             criteria:''
         },
         tree: [],
+
         defaultProps: {
           children: 'children',
           label: 'label'

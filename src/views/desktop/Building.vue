@@ -3,7 +3,21 @@
 <el-row :gutter="24" style="margin-top:20px">
   <el-col :span="4">
       <div class=" bg-purple">
-           <el-tree :data="tree" :props="defaultProps" @node-click="handleNodeClick"></el-tree> 
+            <el-tree
+		  	:data="tree"
+		  	:props="defaultProps"
+		  	show-checkbox
+		  	node-key="id"
+		  	:check-strictly="true"
+			:highlight-current="true"	
+		  	default-expand-all
+		  	:expand-on-click-node="false"
+		  	:render-content="renderContent"
+		  	ref="tree"
+		  	@check-change="checkChange"
+		  	@node-click="nodeClick"
+		  	>
+              </el-tree>
 
       </div>
   </el-col>
@@ -139,7 +153,8 @@
 		this.loadData();
 
 
-	  },
+      },
+      
     
 	
 	loadData(){
@@ -266,6 +281,30 @@
         }
        
     },
+     checkChange(item, node, self){
+        if (node==true) {//点击未选中复选框
+            this.editCheckId = item.id;
+            this.$refs.tree.setCheckedKeys([item.id]);
+             this.communityId = item.id;
+         if(this.communityId!=""){
+             this.loadCommunityData();
+        }
+        } else {
+            if (this.editCheckId == item.id) {//点击已选中复选框，保证至少一个选中
+                this.$refs.tree.setCheckedKeys([item.id]);
+            }
+        }
+      
+    },	
+    nodeClick(item, node, self){
+        this.editCheckId = item.id;
+        this.$refs.tree.setCheckedKeys([item.id]);
+         this.communityId = item.id;
+       
+        if(this.communityId!=""){
+             this.loadCommunityData();
+        }
+    },	
      /**
     * 加载小区树型数据
     */
@@ -284,8 +323,52 @@
                             };
 
                             if(i==0){
-                                this.communityId = response.data[i].id;
+                                this.$refs.tree.setCheckedKeys([this.communityId]);//预先选中id为1的节点;
                                  this.loadCommunityData();
+                            }
+                           
+                           item.push(person);
+
+                    }
+                }
+               
+
+                this.tree = [{
+                    label: '小区管理',
+                    children: item,
+                    id:''
+                }];
+                   //this.tree[0].children = response.data; 
+                    //tree = response.data;
+            }
+					
+		}).catch(error => {
+			 this.$router.push({ path: '/login' });
+						
+		})  
+        
+    },
+
+
+    loadTreeLoadData(){
+        RequestGet("/building/findTree").then(response => {
+            if(response.code == '0000'){
+                //alert( response.data);
+                
+                var item = [];
+
+                if(response.data.length>0){
+                     for(var i= 0 ;i<response.data.length;i++){
+                            var person ={
+                                    label: response.data[i].value,
+                                    id: response.data[i].id
+                            };
+
+                            if(i==0){
+                                this.communityId = response.data[i].id;
+                                 this.$refs.tree.setCheckedKeys([this.communityId]);//预先选中id为1的节点;
+                                 this.loadCommunityData();
+
                             }
                            
                            item.push(person);
@@ -318,7 +401,7 @@
 	//1
 	created:function(){
 		//3
-		this.loadData();
+		this.loadTreeLoadData();
 		
 	
 	},

@@ -61,8 +61,8 @@
         },
         checked: true,
         data:{
-            loginName:"admin",
-            password:"1q2w3e",
+            loginName:"",
+            password:"",
             imgKey:"",
             picCode:""
         },
@@ -174,7 +174,7 @@
     padding: 35px 35px 15px 35px;
     background: #fff;
     border: 1px solid #eaeaea;
-    box-shadow: 0 0 25px #cac6c6;
+   // box-shadow: 0 0 25px #cac6c6;
     .title {
        margin: 0px auto 20px auto;
       text-align: center;
@@ -191,7 +191,8 @@
         width:100%;
         height:100%;
         
-        background-image: url(/static/login-bg.jpg);
+       // background-image: url(/static/login-bg.jpg);
+       background-color: #323639;
         //background-size: 100%;
        background-size:cover;
     }

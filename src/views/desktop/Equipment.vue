@@ -310,7 +310,9 @@
             }).then(response => {
           
 						if(response.code == '0000'){
-								this.communityNo = response.data.communityNo;
+                              
+                                this.communityNo = (Array(4).join(0) + response.data.code).slice(-4);
+                              
     
 						 }
 					

@@ -160,6 +160,7 @@
         },
 
       add(){
+            this.loadMaxCode();
            this.isEdit = false;
            this.dialogFormVisible = true;
 		   this.formtitle ="新增账户";   
@@ -197,6 +198,23 @@
         //alert("asdf");
 
 
+      },
+      loadMaxCode(){
+            this.subData.code = 0;
+            RequestGet("/user/findMax",{parentId:'66b7ef552d9e4e4599e853c7d6101373'}).then(response => {
+                        if(response.code == '0000'){
+                                this.subData.code = parseInt(response.data)+1;
+                        }else{
+                            this.$message({
+                                message: response.message,
+                                type: 'error'
+                            });
+                        }
+                    
+            }).catch(error => {
+                            this.$router.push({ path: '/login' });
+                            
+            })  
       },
       /**
         * 加载角色

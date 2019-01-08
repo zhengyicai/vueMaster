@@ -47,6 +47,7 @@ let routes = [
             { path: '/worklist',component: resolve => require(['./views/desktop/WorkList.vue'], resolve), name: '工程商管理列表' },
             { path: '/residentList',component: resolve => require(['./views/desktop/ResidentList.vue'], resolve), name: '用户管理列表' },
             { path: '/authlist',component: resolve => require(['./views/desktop/AuthList.vue'], resolve), name: '授权管理列表' },
+            { path: '/lockRecord',component: resolve => require(['./views/desktop/LockRecord.vue'], resolve), name: '开锁记录管理' },
             { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },

@@ -100,6 +100,7 @@
 			
 			RequestGet("/user/findUser").then(response => {
 				this.sysUserName = response.data.userName;
+				sessionStorage.setItem("communityId",response.data.communityId);
 				sessionStorage.setItem("userId",response.data.id);
 				sessionStorage.setItem("code",response.data.code);
 				 this.sysUserAvatar = "";
