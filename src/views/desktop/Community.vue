@@ -108,13 +108,12 @@
 				<el-form-item label="地址">
 					<el-input v-model="form.address"></el-input>
 				</el-form-item>
-					<el-form-item label="状态">
+				<el-form-item label="状态">
 					<el-radio-group v-model="form.state">
 						<el-radio label="10">正常</el-radio>
 						<el-radio label="20">禁用</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				
 
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -280,13 +279,15 @@
 	  },
       add(){
 		this.dialogFormVisible = true;
+		
 		this.formtitle ="新增小区";   
 		this.form = {
 			"provinceCode":"",
 			"cityCode":"",
 			"areaCode":"",
 			"code":sessionStorage.getItem("code"),
-			"sysWorkId":sessionStorage.getItem("userId")			
+			"sysWorkId":sessionStorage.getItem("userId"),
+			"state":"10"			
 		};
         
       },
@@ -295,16 +296,20 @@
       },
       open2() {
 		  	if(this.formtitle =="新增小区"){
+
+				  if(this.validate1() == false){
+					  return;
+				  }
 				  this.$confirm('新增小区, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
 					type: 'warning'
 					}).then(() => {	
+
+						
+						//return;
 						RequestPost("/community/workAdd",this.form).then(response => {
 							
-							//this.logining = false; 
-							
-
 							if(response.code=='0000'){
 								this.$message({
 									message: response.message,
@@ -326,13 +331,16 @@
 					
 					
 					}).catch(() => {
-							this.$message({
-								type: 'info',
-								message: '已取消修改'
-							});          
+							// this.$message({
+							// 	type: 'info',
+							// 	message: '已取消修改'
+							// });          
 					});
 
 			}else{
+				 if(this.validate1() == false){
+					  return;
+				  }
 				this.$confirm('修改小区, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -377,6 +385,9 @@
 	  	//新增物业保存 
 	   openAdmin() {
 		  	if(this.formAdmintitle =="添加物业账号"){
+				  if(this.valuidate2() ==false){
+					  return;
+				  }
 				  this.$confirm('添加物业账号, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
@@ -412,7 +423,16 @@
 							});          
 					});
 
-			}else{
+			}else{ 
+
+				if(this.form1.password.trim()=="" ||this.form1.password==null){
+					this.$message({
+						type: 'error',
+						message: '密码不能为空'
+					}); 
+					return;
+				}	
+
 				this.$confirm('修改物业账号, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -661,9 +681,111 @@
         };
 		this.formAdmintitle ="修改物业账号";
 		
-      },
+	  },
+
+	  valuidate2(){
+		  if(this.form1.userName =="" ||this.form1.userName.trim() =="" || this.form1.userName == null){
+				this.$message({
+					type: 'error',
+					message: "用户名不能为空"
+				});          
+				return false;
+		  }
+		  if(this.form1.loginName =="" ||this.form1.loginName.trim() =="" || this.form1.loginName == null){
+				this.$message({
+					type: 'error',
+					message: "登录名不能为空"
+				});          
+				return false;
+		  }	
+
+		  if(this.form1.password =="" ||this.form1.password.trim() =="" || this.form1.password == null){
+				this.$message({
+					type: 'error',
+					message: "密码不能为空"
+				});          
+				return false;
+		  }	
+
+		   if(this.form1.mobile =="" ||this.form1.mobile.trim() =="" || this.form1.mobile == null){
+				this.$message({
+					type: 'error',
+					message: "手机号不能为空"
+				});          
+				return false;
+		  }	
+
+
+
+
+	  },	
+	  validate1(){  //新增（修改）小区
+	
+		
+		if(this.form.communityName =="" || this.form.communityName == null){
+				//this.warningText = ;
+				this.$message({
+					type: 'error',
+					message: "小区名字不能为空"
+				});          
+				return false;
+		}
+
+		if(this.form.communityName.trim().length =="" ){
+				//this.warningText = ;
+				this.$message({
+					type: 'error',
+					message: "小区名字不能为空"
+				});          
+				return false;
+		}
+		if(this.form.communityName.length>20){
+				this.$message({
+					type: 'error',
+					message: "小区名字长度过大"
+				});    
+				return false;				
+		}
+		if(this.form.masterNum <=0 || this.form.masterNum == null){
+				this.$message({
+					type: 'error',
+					message: "主机数不能小于1"
+				});
+				return false;
+		}
+		if(this.form.userNum <=0 || this.form.userNum == null){
+				this.$message({
+					type: 'error',
+					message: "用户数不能小于1"
+				});
+				return false;
+		}
+		if(this.form.provinceCode.trim().length ==0 || this.form.provinceCode == null){
+				this.$message({
+					type: 'error',
+					message: "请选择省份"
+				});
+				return false;
+		}
+		if(this.form.cityCode.trim().length ==0 || this.form.cityCode == null){
+				this.$message({
+					type: 'error',
+					message: "请选择城市"
+				});
+				return false;
+		}
+		if(this.form.areaCode.trim().length ==0 || this.form.areaCode == null){
+				this.$message({
+					type: 'error',
+					message: "请选择区县"
+				});
+				return false;
+		}
 
 	},
+
+	},
+	
 	//1
 	created:function(){
 		//3
@@ -683,7 +805,7 @@
 		datalist:[],
 		
 		listLoading: false,
-		form:{},
+		form:{communityName:"",provinceCode:"",cityCode:"",areaCode:""},
 		form1:{},
 		form2:{},
 		dialogFormVisible:false,
@@ -695,7 +817,8 @@
 		dialogFormAdminVisible:false,//物业
 		dialogFormAdminUpdateVisible:false,
 		dialogFormWorkVisible:false,  //工程商
-		isEditUser:false //是否禁用
+		isEditUser:false, //是否禁用
+		warningText:"" //警告语
 
 
       };

@@ -186,7 +186,7 @@
     showAddPanel(){
         this.isEdit = false;
         this.dialogFormVisible = true;
-        this.formtitle ="新增账户";   
+        this.formtitle ="新增厂商账户";   
         
         this.subData = {
             userName: '',
@@ -201,10 +201,34 @@
         };
 
     },
+
+    validate(){
+        if(this.subData.userName.trim() =="" || this.subData.userName == null){
+             this.$message({
+                message: "用户名不能为空",
+                type: 'error'
+            });
+            return false;
+        }
+        if(this.subData.loginName.trim() =="" || this.subData.loginName == null){
+             this.$message({
+                message: "登录名不能为空",
+                type: 'error'
+            });
+            return false;
+        }
+        if(this.subData.password.trim() =="" || this.subData.password == null){
+             this.$message({
+                message: "密码不能为空",
+                type: 'error'
+            });
+            return false;
+        }
+    },
      edit(index, rows){
             this.isEdit = true;
             this.dialogFormVisible = true;
-		    this.formtitle ="修改账户";   
+		    this.formtitle ="修改厂商账户";   
             this.subData = rows;
             this.subData.password = "******";
         //alert("asdf");
@@ -255,13 +279,18 @@
       },
     open(){
        
-        if(this.formtitle == '新增账户'){
+        if(this.formtitle == '新增厂商账户'){
               
               if(this.communityId ==''){
                   this.$message({
                     message: "请选择厂商",
                     type: 'error'
                   });
+              }
+
+
+              if(this.validate() == false){
+                  return;
               }
               this.subData.parentId =this.communityId;  //admin
               this.subData.roleId='8fd0882be71e11e8987f5254003ad144';
@@ -290,7 +319,12 @@
             })
 
           }else{
-            
+              
+
+              if(this.validate() == false){
+                  return;
+              }
+              
               RequestPost("/user/update",this.subData).then(response => {
 						
 						//this.logining = false; 

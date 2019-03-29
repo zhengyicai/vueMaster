@@ -224,6 +224,13 @@
             })
 
           }else{
+              if(this.subData.loginName.trim()=="" || this.subData.loginName == null){
+                this.$message({
+                    message: "登录名不能为空",
+                    type: 'error'
+                });
+                return;
+              }
             
               RequestPost("/user/update",this.subData).then(response => {
 						

@@ -48,6 +48,7 @@ let routes = [
             { path: '/residentList',component: resolve => require(['./views/desktop/ResidentList.vue'], resolve), name: '用户管理列表' },
             { path: '/authlist',component: resolve => require(['./views/desktop/AuthList.vue'], resolve), name: '授权管理列表' },
             { path: '/lockRecord',component: resolve => require(['./views/desktop/LockRecord.vue'], resolve), name: '开锁记录管理' },
+            { path: '/adminCard',component: resolve => require(['./views/desktop/AdminCard.vue'], resolve), name: '物业房卡管理' },
             { path: '/tableTest', component: TableTest, name: '列表测试' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
@@ -65,6 +66,7 @@ let routes = [
             { path: '/role',component: resolve => require(['./views/system/Role.vue'], resolve), name: '权限管理' },
             { path: '/updatePw',component: resolve => require(['./views/system/UpdatePw.vue'], resolve), name: '修改密码' },
             { path: '/userInfo',component: resolve => require(['./views/system/UserInfo.vue'], resolve), name: '账户管理' },
+            
         ]
     },
     {

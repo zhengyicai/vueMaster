@@ -3,7 +3,24 @@
 <el-row :gutter="24" style="margin-top:20px">
   <el-col :span="4">
       <div class=" bg-purple">
-           <el-tree :data="tree" :props="defaultProps" @node-click="handleNodeClick"></el-tree> 
+           <el-tree :data="tree"  :props="defaultProps" :check-strictly="true"
+			:highlight-current="true"	 @node-click="handleNodeClick"></el-tree> 
+
+            <!-- <el-tree
+		  	:data="tree"
+		  	:props="defaultProps"
+		  	
+		  	node-key="id"
+		  	:check-strictly="true"
+			:highlight-current="true"	
+		  	
+		  	:expand-on-click-node="false"
+		  	:render-content="renderContent"
+		  	ref="tree"
+		  	@check-change="checkChange"
+		  	@node-click="handleNodeClick"
+		  	>
+              </el-tree> -->
 
       </div>
   </el-col>
@@ -49,7 +66,7 @@
 			<el-form ref="subData" :model="subData" label-width="100px" @submit.prevent="onSubmit" style="margin:20px;">
                     
                     <el-form-item label="房间名称">
-                        <el-input v-model="subData.roomName"  placeholder="请输入楼栋名称 例如：1"></el-input>
+                        <el-input type="number" v-model="subData.roomName"  placeholder="请输入楼栋名称 例如：1"></el-input>
                     </el-form-item>
                     <el-form-item label="状态">
 					<el-radio-group v-model="subData.state">
@@ -67,32 +84,71 @@
 
 
         <el-dialog   title="房卡管理" :visible.sync="dialogFormVisibleRoom" >
-			<el-form ref="subData" :model="subData1" label-width="100px" @submit.prevent="onSubmit" style="margin:20px;">
+			<el-form ref="subData" :model="subData1" label-width="100px" @submit.prevent="onSubmit" style="margin:0px;">
                     
                  
                  
                 <el-form-item label="卡号1">
-                        <el-input v-model="one" type="number" placeholder="请输入10位数的卡号"></el-input>
+                        <el-input style="width:60%" v-bind:disabled="oneSum" v-model="one" type="number" placeholder="请输入10位数的卡号"></el-input>
+                        <el-button type="primary" v-bind:disabled="oneId==''"  style="font-size:12px" @click="query(one,oneId)" >查看设备</el-button>
                 </el-form-item>
                 <el-form-item label="卡号2">
-                        <el-input v-model="two"  placeholder="请输入10位数的卡号"></el-input>
+                        <el-input style="width:60%" v-bind:disabled="twoSum" v-model="two"  placeholder="请输入10位数的卡号"></el-input>
+                         <el-button type="primary" v-bind:disabled="twoId==''"  style="font-size:12px" @click="query(two,twoId)" >查看设备</el-button>
                 </el-form-item>
                 <el-form-item label="卡号3">
-                        <el-input v-model="three"  placeholder="请输入10位数的卡号"></el-input>
+                        <el-input style="width:60%"  v-bind:disabled="threeSum" v-model="three"  placeholder="请输入10位数的卡号"></el-input>
+                         <el-button type="primary" v-bind:disabled="threeId==''" style="font-size:12px" @click="query(three,threeId)" >查看设备</el-button>
                 </el-form-item>
                 <el-form-item label="卡号4">
-                        <el-input v-model="four"  placeholder="请输入10位数的卡号"></el-input>
+                        <el-input style="width:60%"  v-bind:disabled="fourSum" v-model="four"  placeholder="请输入10位数的卡号"></el-input>
+                         <el-button type="primary" v-bind:disabled="fourId==''" style="font-size:12px"   @click="query(four,fourId)">查看设备</el-button>
                 </el-form-item>
                 <el-form-item label="卡号5">
-                        <el-input v-model="free"  placeholder="请输入10位数的卡号"></el-input>
+                        <el-input style="width:60%" v-bind:disabled="freeSum" v-model="free"  placeholder="请输入10位数的卡号"></el-input>
+                         <el-button type="primary" v-bind:disabled="freeId==''" style="font-size:12px"  @click="query(free,freeId)">查看设备</el-button>
                 </el-form-item>
                
                    
 			</el-form>	
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisibleRoom = false">取 消</el-button>
-				<el-button type="primary" @click="open1()">确 定</el-button>
+				<el-button  type="primary" @click="open1()">确 定</el-button>
 			</div>
+        </el-dialog>
+
+
+
+        <el-dialog   title="设备管理" :visible.sync="dialogFormVisibleRoomDevice" >
+            卡号:{{roomNo}}
+            <!-- {{roomId}} -->
+			
+                
+                <!-- <el-form-item label="设备号" v-for="item in items" :key="item.id" >
+                        <el-button disabled="disabled" style="width:50%">{{one}}</el-button>
+                        
+                        <el-button type="primary" style="font-size:12px" @click="query()" >已打卡</el-button>
+                </el-form-item> -->
+                <el-table :data="equlist" border style="width: 100%">
+                        <el-table-column prop="equId" label="设备号" width="200">
+                        </el-table-column>
+                      
+                     <el-table-column  label="状态" min-width="100">
+                
+			            	<template slot-scope="scope"><span class="span" v-if="scope.row.state=='10'">已发卡</span> <span class="span" v-if="scope.row.state=='20'">未发卡</span></template>
+			        </el-table-column>
+                        
+                    </el-table>
+                <!-- <el-form-item label="设备号2">
+                        <el-button disabled="disabled" style="width:50%">{{one}}</el-button>
+                        <el-button type="danger" style="font-size:12px" @click="query()" >未发卡</el-button>
+                </el-form-item> -->
+             
+			
+			<!-- <div slot="footer" class="dialog-footer">
+				<el-button @click="dialogFormVisibleRoomDevice = false">取 消</el-button>
+				<el-button type="primary" @click="open1()">确 定</el-button>
+			</div> -->
         </el-dialog>
 
 
@@ -166,6 +222,11 @@
 						
 	
     },
+     checkChange(item, node, self){
+        // this.$refs.tree.setCheckedKeys([item.id]);
+      
+      
+    },	
 
 
     showAddPanel(){
@@ -182,7 +243,15 @@
 
     },
     open(){
-       
+        
+
+        if(this.subData.roomName.trim() =="" ||  this.subData.roomName ==null){
+                this.$message({
+                    message: "房间名称不能为空",
+                    type: 'error'
+                });
+                return;
+        }
         RequestPost("/room/update",this.subData).then(response => {
                     if(response.code=='0000'){
                         this.$message({
@@ -205,8 +274,13 @@
 
     },
      open1(){
-
+         
+         if(this.validate() == false){
+            return;
+         }
+        
         this.subData1.cardNos = this.one+","+this.two+","+this.three+","+this.four+","+this.free;  
+        this.subData1.oldcardNos = this.oneOld+","+this.twoOld+","+this.threeOld+","+this.fourOld+","+this.freeOld;  
         RequestPost("/room/addCard",this.subData1).then(response => {
                     if(response.code=='0000'){
                         this.$message({
@@ -214,6 +288,7 @@
                             type: 'success'
                         });  
                         this.dialogFormVisibleRoom = false;
+                        this.subData1.oldcardNos="";
                     }else{
                         this.$message({
                             message: response.message,
@@ -247,6 +322,26 @@
          this.four = "";
          this.free = "";
 
+         this.oneId = "";
+         this.twoId = "";
+         this.threeId = "";
+         this.fourId = "";
+         this.freeId = "";
+
+
+         this.oneOld = "";
+         this.twoOld = "";
+         this.threeOld = "";
+         this.foureOld = "";
+         this.freeOld = "";
+
+
+        this.oneSum = false;
+        this.twoSum = false;
+        this.threeSum = false;
+        this.fourSum = false;
+        this.freeSum = false;
+
          this.subData1.buildingId = rows.buildingId;
          this.subData1.communityId = rows.communityId;
          this.subData1.roomId  = rows.id;
@@ -258,15 +353,55 @@
                           if(response.data.length>0){
                               for(var i = 0 ;i<response.data.length;i++){
                                   if(i ==0){
-                                      this.one = response.data[i].cardNo;
+                                      this.one = response.data[i].cardNo+"";
+                                      this.oneOld = response.data[i].cardNo+"";
+                                      this.oneId= response.data[i].id;
+                                      if( parseInt(response.data[i].countSum)>0){
+                                          this.oneSum = true;
+                                      }else{
+                                          this.oneSum = false;
+                                      }
                                   }else if(i ==1){
-                                      this.two = response.data[i].cardNo;
+                                      this.two = response.data[i].cardNo+"";
+                                      this.twoId= response.data[i].id;
+                                      this.twoOld = response.data[i].cardNo+"";
+
+                                      if( parseInt(response.data[i].countSum)>0){
+                                          this.twoSum = true;
+                                      }else{
+                                          this.twoSum = false;
+                                      }
                                   }else if(i ==2){
-                                      this.three = response.data[i].cardNo;
+                                      this.three = response.data[i].cardNo+"";
+                                      this.threeId= response.data[i].id;
+                                      this.threeOld = response.data[i].cardNo+"";
+
+                                      if( parseInt(response.data[i].countSum)>0){
+                                          this.threeSum = true;
+                                      }else{
+                                          this.threeSum = false;
+                                      }
                                   }else if(i ==3){
-                                      this.four = response.data[i].cardNo;
+                                      this.four = response.data[i].cardNo+"";
+                                      this.fourId= response.data[i].id;
+                                      this.fourOld = response.data[i].cardNo+"";
+
+                                       if( parseInt(response.data[i].countSum)>0){
+                                          this.fourSum = true;
+                                      }else{
+                                          this.fourSum = false;
+                                      }
                                   }else if(i ==4){
-                                      this.free = response.data[i].cardNo;
+                                      this.free = response.data[i].cardNo+"";
+                                      this.freeId= response.data[i].id;
+                                      this.freeOld = response.data[i].cardNo+"";
+
+                                       if( parseInt(response.data[i].countSum)>0){
+                                          this.freeSum = true;
+                                      }else{
+                                          this.freeSum = false;
+                                      }
+                                      
                                   }
                               }
                           }
@@ -288,6 +423,29 @@
          
 
     },  
+    query(roomNo,id){
+        this.dialogFormVisibleRoomDevice = true;
+        this.roomNo =  roomNo;
+        this.roomId  = id;
+        this.equlist=[];    
+
+        RequestGet("/room/findCardEquipment",{
+               cardId:id
+            }).then(response => {
+                    if(response.code == '0000'){
+                                
+                         this.equlist  = response.data;
+                    }     
+					
+		}).catch(error => {
+						 this.$router.push({ path: '/login' });
+						
+        })  
+
+
+
+
+    },
     addCard(){
          this.dialogFormVisible = true;   
     },
@@ -375,7 +533,48 @@
 						
 		})  
         
-    }
+    },
+    validate(){
+        
+        if(this.one.trim()!="" && (parseInt(this.one.trim())>2147483647 ||parseInt(this.one.trim())<1)  ){
+            this.$message({
+                message: "卡号1输入有误",
+                type: 'error'
+            });
+            return false;
+        }
+
+        if(this.two.trim()!="" && (parseInt(this.two.trim())>2147483647 ||parseInt(this.two.trim())<1) ){
+            this.$message({
+                message: "卡号2输入有误",
+                type: 'error'
+            });
+            return false;
+        }
+        if(this.three.trim()!="" && (parseInt(this.three.trim())>2147483647 ||parseInt(this.three.trim())<1)){
+            this.$message({
+                message: "卡号3输入有误",
+                type: 'error'
+            });
+            return false;
+        }
+        if(this.four.trim()!="" && (parseInt(this.four.trim())>2147483647 ||parseInt(this.four.trim())<1)){
+            this.$message({
+                message: "卡号4输入有误",
+                type: 'error'
+            });
+            return false;
+        }
+        if(this.free.trim()!="" && (parseInt(this.free.trim())>2147483647 ||parseInt(this.free.trim())<1)){
+            this.$message({
+                message: "卡号5输入有误",
+                type: 'error'
+            });
+            return false;
+        }
+
+    },
+
     
   
 
@@ -400,13 +599,15 @@
         unitId:"",
         dialogFormVisible:false,
         dialogFormVisibleRoom:false,
+        dialogFormVisibleRoomDevice:false,
         subData:{},
         subData1:{
             buildingId:"",
             communityId:"",
             roomId:"",
             cardNos:"",
-            unitId:""
+            unitId:"",
+            oldcardNos:""
 
         },
         one:"",
@@ -414,6 +615,29 @@
         three:"",
         four:"",
         free:"",
+        
+        oneId:"",
+        twoId:"",
+        threeId:"",
+        fourId:"",
+        freeId:"",
+        
+        roomNo:"",
+        roomId:"",
+        
+        oneOld:"",
+        twoOld:"",
+        threeOld:"",
+        fourOld:"",
+        freeOld:"",
+
+        oneSum:false,
+        twoSum:false,
+        threeSum:false,
+        fourSum:false,
+        freeSum:false,
+
+
         page:{
 			pageSize:PageSize,   //一页显示的条数
             criteria:''
@@ -427,7 +651,7 @@
      
 
         datalist:[],
-       
+        equlist:[],
        
       };
     }

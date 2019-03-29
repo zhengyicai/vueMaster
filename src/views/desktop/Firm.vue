@@ -163,7 +163,7 @@
             this.loadMaxCode();
            this.isEdit = false;
            this.dialogFormVisible = true;
-		   this.formtitle ="新增账户";   
+		   this.formtitle ="新增厂商";   
 		   
            this.subData = {
                 userName: '',
@@ -188,11 +188,50 @@
 
 
       },
+
+      validate(){
+          if(this.subData.userName.trim() =="" || this.subData.userName == null){
+            this.$message({
+                message:"用户名不能为空",
+                type: 'error'
+            });
+            return false;
+          }
+
+          if(this.subData.loginName.trim() =="" || this.subData.loginName == null){
+            this.$message({
+                message:"登录名不能为空",
+                type: 'error'
+            });
+            return false;
+          }
+          if(this.subData.password.trim() =="" || this.subData.password == null){
+            this.$message({
+                message:"密码不能为空",
+                type: 'error'
+            });
+            return false;
+          }
+
+          if(this.subData.code=="" || this.subData.code == null){
+            this.$message({
+                message:"厂商编号不能为空",
+                type: 'error'
+            });
+            return false;
+          }
+
+
+
+
+
+
+      },
     
        edit(index, rows){
             this.isEdit = true;
             this.dialogFormVisible = true;
-		    this.formtitle ="修改账户";   
+		    this.formtitle ="修改厂商";   
             this.subData = rows;
             this.subData.password = "******";
         //alert("asdf");
@@ -237,10 +276,15 @@
         
         },
       open(){
-          if(this.formtitle == '新增账户'){
+          if(this.formtitle == '新增厂商'){
               this.subData.parentId ='66b7ef552d9e4e4599e853c7d6101373';  //admin
               this.subData.roleId='70220c5ee71e11e8987f5254003ad144';
               this.subData.roleName='厂商管理员';
+               
+              if(this.validate() == false){
+                  return;
+              }
+
               RequestPost("/user/firmAdd",this.subData).then(response => {
 						
 						//this.logining = false; 
@@ -262,7 +306,10 @@
             })
 
           }else{
-            
+              
+              if(this.validate() == false){
+                  return;
+              }
               RequestPost("/user/update",this.subData).then(response => {
 						
 						//this.logining = false; 

@@ -78,16 +78,16 @@
 			<el-form ref="subData" :model="subData" label-width="100px" @submit.prevent="onSubmit" style="margin:20px;">
                     
                     <el-form-item label="楼栋名称">
-                        <el-input v-model="subData.buildingNo"  placeholder="请输入楼栋名称 例如：1"></el-input>
+                        <el-input type="number"  v-model="subData.buildingNo"  placeholder="请输入楼栋名称 例如：1"></el-input>
                     </el-form-item>
                     <el-form-item label="单元名称">
-                        <el-input v-model="subData.unitName"  placeholder="请输入单元名称 例如：1"></el-input>
+                        <el-input type="number" v-model="subData.unitName"  placeholder="请输入单元名称 例如：1"></el-input>
                     </el-form-item>
                      <el-form-item label="楼层数">
-                        <el-input v-model="subData.floorNumber"  placeholder="请输入楼层数, 1-50"></el-input>
+                        <el-input type="number" v-model="subData.floorNumber"  placeholder="请输入楼层数, 1-50"></el-input>
                     </el-form-item>
                      <el-form-item label="层户数">
-                        <el-input v-model="subData.roomNumber"  placeholder="请输入层户数, 1-10"></el-input>
+                        <el-input type="number" v-model="subData.roomNumber"  placeholder="请输入层户数, 1-10"></el-input>
                     </el-form-item>
                    
 			</el-form>	
@@ -181,7 +181,9 @@
 
     },
     open(){
-       
+        if(this.valuidate2() == false){
+            return;
+        }
         RequestPost("/building/createRoom",this.subData).then(response => {
                     if(response.code=='0000'){
                         this.$message({
@@ -391,7 +393,40 @@
 						
 		})  
         
-    }
+    },
+    valuidate2(){
+		  if(this.subData.buildingNo =="" ||this.subData.buildingNo.trim() =="" || this.subData.buildingNo == null){
+				this.$message({
+					type: 'error',
+					message: "楼栋名称不能为空"
+				});          
+				return false;
+		  }
+		  if(this.subData.unitName =="" ||this.subData.unitName.trim() =="" || this.subData.unitName == null){
+				this.$message({
+					type: 'error',
+					message: "单元名称不能为空"
+				});          
+				return false;
+		  }	
+
+		  if(this.subData.floorNumber<1 || this.subData.floorNumber>50){
+				this.$message({
+					type: 'error',
+					message: "楼层数的范围为1-50"
+				});          
+				return false;
+		  }	
+
+		   if(this.subData.roomNumber<1 || this.subData.roomNumber>10){
+				this.$message({
+					type: 'error',
+					message: "层户数的范围为1-10"
+				});          
+				return false;
+		  }	
+
+	},	
     
   
 

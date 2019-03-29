@@ -39,18 +39,18 @@
             <el-table-column prop="equId" label="序列号" width="150" sortable>
 			</el-table-column>
 			<el-table-column  label="单元" min-width="150" sortable>
-                            <template slot-scope="scope">{{scope.row.unitName}}单元</template>    
+                            <template slot-scope="scope">{{scope.row.unitName}} <span v-if="scope.row.unitName!='' && scope.row.unitName!=null ">单元</span></template>    
 			</el-table-column>
 			<el-table-column  label="状态" min-width="120">
 				<template slot-scope="scope">{{ state(scope.row.state)}}</template>
 			</el-table-column>
-            <el-table-column  label="最新设备状态" min-width="150">
+            <!-- <el-table-column  label="最新设备状态" min-width="150">
                 
 				<template slot-scope="scope"><span class="span" v-if="scope.row.nowDateStatus=='离线'"><i class="tip"></i></span> <span class="span" v-if="scope.row.nowDateStatus=='在线'"><i class="tip" style="background:green;"></i></span>{{scope.row.nowDateStatus}}</template>
 			</el-table-column>
             <el-table-column  label="最新门磁状态" min-width="150">
 				<template slot-scope="scope"><span class="span" v-if="scope.row.nowState=='异常'"><i class="tip"></i></span> <span class="span" v-if="scope.row.nowState=='正常'"><i class="tip" style="background:green;"></i></span>{{scope.row.nowState}}</template>
-			</el-table-column>
+			</el-table-column> -->
 			
 			
 			<el-table-column label="操作" min-width="250">
@@ -58,7 +58,8 @@
 				<!-- <el-button size="small" type="primary"  @click="edit(scope.$index,scope.row)">编辑</el-button>
 				<el-button size="small" type="primary"  v-if='scope.row.sysUserId=="" ||  scope.row.sysUserId ==null' @click="addAdmin(scope.$index,scope.row)">新增物业</el-button>
 				<el-button size="small" type="warning"  v-if='scope.row.sysUserId!="" ||  scope.row.sysUserId !=null' @click="editAdmin(scope.$index,scope.row)">修改物业</el-button> -->
-                <el-button size="small" type="danger" @click="deleteRow(scope.$index, scope.row)">删除</el-button>
+                <el-button size="small" type="danger" v-if="false" @click="deleteRow(scope.$index, scope.row)">删除</el-button>
+                <el-button size="small" type="warning" @click="updateRow(scope.$index, scope.row)">替换</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -100,7 +101,7 @@
 					    </el-select>
                     </el-form-item>
                     <el-form-item label="*设备序列号">
-                        <el-input  v-model="subData.equId"  placeholder="请输入设备序列号"></el-input>
+                        <el-input  v-model="subData.equId"  placeholder="请输入设备序列号后8位"></el-input>
                     </el-form-item>
                     <el-form-item label="状态">
 					<el-radio-group v-model="subData.state">
@@ -112,6 +113,27 @@
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
 				<el-button type="primary" @click="open()">确 定</el-button>
+			</div>
+        </el-dialog>
+
+
+
+        <el-dialog   title="替换设备" :visible.sync="updateDialogFormVisible" >
+			<el-form ref="subData1" :model="subData1" label-width="120px" @submit.prevent="onSubmit" style="margin:20px;">
+                    <el-form-item label="*设备名称">
+                        <el-input v-model="subData1.equipmentName"  placeholder="请输入设备名称"></el-input>
+                    </el-form-item>                   
+                    <el-form-item label="原设备序列号">
+                        <el-input  v-model="subData1.oldequId" disabled="disabled"  placeholder="请输入设备序列号后8位"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="*新设备序列号">
+                        <el-input  v-model="subData1.newequId"  placeholder="请输入设备序列号后8位"></el-input>
+                    </el-form-item>
+			</el-form>	
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="updateDialogFormVisible = false">取 消</el-button>
+				<el-button type="primary" @click="open1()">确 定</el-button>
 			</div>
         </el-dialog>
 
@@ -184,6 +206,12 @@
 
       },
       open(){
+
+
+          if(this.validate() == false){
+              //this.subData.equId=="";
+              return;
+          }
           this.subData.equCode = this.subData.equipmentType =="10"?"0000000000":this.subData.equipmentType =="20"?"0000000000":"FFFF000000";
           this.subData.equId = this.communityNo+this.subData.equId;
           RequestPost("/equipment/add",this.subData).then(response => {
@@ -194,7 +222,55 @@
 								message: response.message,
 								type: 'success'
 							});  
-							this.dialogFormVisible = false;
+                            this.dialogFormVisible = false;
+                            //this.subData = {};
+						}else{
+							this.$message({
+								message: response.message,
+								type: 'error'
+							});
+						}
+						this.loadData();
+            }).catch(error => {
+            this.$router.push({ path: '/login' });
+            })
+          
+      },
+
+
+      open1(){
+
+          if(this.subData1.equipmentName == ""){
+            this.$message({
+                type: 'error',
+                message: '请输入设备名称'
+            });
+              return;
+          }
+          if(this.subData1.newequId == "" || this.subData1.newequId.length>8){
+            this.$message({
+                type: 'error',
+                message: '请输入设备序列号后8位'
+            });
+              return;
+          }
+         
+          this.communityNo = (Array(4).join(0) +sessionStorage.getItem("code")).slice(-4);
+         // alert(this.communityNo+this.subData1.equCode);  
+          this.subData1.equId =this.communityNo+this.subData1.newequId;
+          this.subData1.equCode = this.subData.equipmentType =="10"?"0000000000":this.subData.equipmentType =="20"?"0000000000":"FFFF000000";
+          //this.subData1.equId = this.communityNo+this.subData1.equId;
+          this.subData1.equCardState = "20"; //修改设备房卡关联数据状态
+          RequestPost("/equipment/update",this.subData1).then(response => {
+						
+						
+						if(response.code=='0000'){
+							this.$message({
+								message: response.message,
+								type: 'success'
+							});  
+                            this.updateDialogFormVisible = false;
+                        
 						}else{
 							this.$message({
 								message: response.message,
@@ -209,38 +285,48 @@
       },
       getUsers(){},
 
+      updateRow(index,rows){
+            this.subData1 = rows;
+            this.updateDialogFormVisible = true;
+            this.subData1.equipmentName = rows.equipmentName;
+            this.subData1.oldequId = rows.equId.substr(4,12);
+            this.subData1.newequId = "";
+            
 
-      
+      },
+ 
 	  deleteRow(index, rows) {
        this.$confirm('确认删除, 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
             }).then(() => {
-            // this.$message({
-            //     type: 'success',
-            //     message: '删除成功!'
-            // });
+            this.$message({
+                type: 'success',
+                message: '删除功能暂时未开放!'
+            });
 
-            RequestPost("/equipment/delete",rows).then(response => {
+
+            //删除功能暂时不开放
+            // RequestPost("/equipment/delete",rows).then(response => {
 						
-						//this.logining = false; 
-                if(response.code=='0000'){
-                    this.$message({
-                        message: response.message,
-                        type: 'success'
-                    });  
-                    this.dialogFormVisible = false;
-                }else{
-                    this.$message({
-                        message: response.message,
-                        type: 'error'
-                    });
-                }
-                this.loadData();
-            }).catch(error => {
-            this.$router.push({ path: '/login' });
-            })
+			// 			//this.logining = false; 
+            //     if(response.code=='0000'){
+            //         this.$message({
+            //             message: response.message,
+            //             type: 'success'
+            //         });  
+            //         this.dialogFormVisible = false;
+            //     }else{
+            //         this.$message({
+            //             message: response.message,
+            //             type: 'error'
+            //         });
+            //     }
+            //     this.loadData();
+            // }).catch(error => {
+            // this.$router.push({ path: '/login' });
+            // })
 
 
             
@@ -317,7 +403,7 @@
 						 }
 					
         }).catch(error => {
-                this.$router.push({ path: '/login' });
+               // this.$router.push({ path: '/login' });
 						
 		})  
     },
@@ -418,6 +504,42 @@
 		})  
         
     },
+    validate(){
+        if(this.subData.equipmentName.trim()=="" || this.subData.equipmentName == null){
+            this.$message({
+                type: 'error',
+                message: '设备名称不能为空'
+            });         
+            return false;
+        }
+
+        if(this.subData.communityId.trim()=="" || this.subData.communityId == null){
+            this.$message({
+                type: 'error',
+                message: '所属小区不能为空'
+            });         
+            return false;
+        }
+
+        if(this.subData.equId.trim()=="" || this.subData.equId == null){
+            this.$message({
+                type: 'error',
+                message: '设备序列号不能为空'
+            });         
+            return false;
+        }
+
+        if(this.subData.equId.trim().length!=8){
+            this.$message({
+                type: 'error',
+                message: '请输入设备序列号后8位'
+            });         
+            return false;
+        }
+
+
+
+    },
 
 
 
@@ -464,6 +586,8 @@
           value: '30',
           label: '单元门口机'
         }],
+        updateDialogFormVisible:false,
+        subData1:{newequId:""},
 
       };
     }

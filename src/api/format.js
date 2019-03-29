@@ -19,3 +19,7 @@ export function state(row){
     var date = row;
           return date =='10'?'正常':date =='20'?'禁用':'';
 };
+export function cardState(row){
+    var date = row;
+          return date =='10'?'已发卡':date =='20'?'未发卡':'';
+};
